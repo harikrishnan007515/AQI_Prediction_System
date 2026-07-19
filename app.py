@@ -1,3 +1,11 @@
+import sys
+
+from streamlit.runtime.scriptrunner import get_script_run_ctx
+
+if get_script_run_ctx(suppress_warning=True) is None:
+    print("Run this app with: streamlit run app.py")
+    sys.exit(0)
+
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -137,7 +145,7 @@ with tab1:
                    'threshold': {'line': {'color': "red", 'width': 4}, 'thickness': 0.75, 'value': who_limits['PM2.5']}}
         ))
         fig_pm.update_layout(height=260, margin=dict(l=20, r=20, t=20, b=20), paper_bgcolor="rgba(0,0,0,0)", font={'color': "white"})
-        st.plotly_chart(fig_pm, use_container_width=True)
+        st.plotly_chart(fig_pm, width="stretch")
 
     with mid_col2:
         st.markdown("<h5 style='text-align: center; color: #ddd;'>Pollutant Toxicity Ratio</h5>", unsafe_allow_html=True)
@@ -150,7 +158,7 @@ with tab1:
                          color_discrete_sequence=px.colors.qualitative.Pastel)
         fig_bar.add_vline(x=1.0, line_dash="dash", line_color="red", annotation_text="Safe Limit")
         fig_bar.update_layout(height=260, margin=dict(l=10, r=10, t=10, b=10), showlegend=False, paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)", font={'color': "white"}, xaxis_title="")
-        st.plotly_chart(fig_bar, use_container_width=True)
+        st.plotly_chart(fig_bar, width="stretch")
 
     st.divider()
 
@@ -171,7 +179,7 @@ with tab1:
         gauge={'shape': "bullet", 'axis': {'range': [None, 20]}, 'threshold': {'line': {'color': "red", 'width': 2}, 'thickness': 0.75, 'value': who_limits['CO']}, 'bar': {'color': "#2ca02c"}}))
     
     fig_bullet.update_layout(height=220, margin=dict(l=10, r=10, t=10, b=10), paper_bgcolor="rgba(0,0,0,0)", font={'color': "white"})
-    st.plotly_chart(fig_bullet, use_container_width=True)
+    st.plotly_chart(fig_bullet, width="stretch")
 
 
 # ==========================================
@@ -190,7 +198,7 @@ with tab2:
                                color=classes, color_discrete_map={"Good": "#00CC96", "Moderate": "#FFA15A", "Poor": "#EF553B", "Hazardous": "#AB63FA"})
             fig_donut.update_traces(textinfo='percent+label', textfont_size=14)
             fig_donut.update_layout(height=300, showlegend=False, paper_bgcolor="rgba(0,0,0,0)", font={'color': "white"}, margin=dict(t=10, b=10))
-            st.plotly_chart(fig_donut, use_container_width=True)
+            st.plotly_chart(fig_donut, width="stretch")
             
     with row2_c2:
         # TYPE 2: Multivariate Radar Chart
@@ -201,7 +209,7 @@ with tab2:
         fig_radar = px.line_polar(r=values, theta=pollutants, line_close=True)
         fig_radar.update_traces(fill='toself', line_color=pred_color)
         fig_radar.update_layout(height=300, paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)", font={'color': "white"}, margin=dict(t=10, b=10))
-        st.plotly_chart(fig_radar, use_container_width=True)
+        st.plotly_chart(fig_radar, width="stretch")
 
     st.divider()
     row3_c1, row3_c2 = st.columns(2)
@@ -215,7 +223,7 @@ with tab2:
             imp_df = pd.DataFrame({'Feature': input_features, 'Weight': importances}).sort_values(by='Weight', ascending=True)
             fig_imp = px.bar(imp_df, x='Weight', y='Feature', orientation='h', color_discrete_sequence=['#4facfe'])
             fig_imp.update_layout(height=300, paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)", font={'color': "white"}, margin=dict(t=10, b=10, l=10, r=10), xaxis_title="", yaxis_title="")
-            st.plotly_chart(fig_imp, use_container_width=True)
+            st.plotly_chart(fig_imp, width="stretch")
         except:
             st.warning("Feature importance unavailable.")
 
@@ -267,7 +275,7 @@ with row3_c2:
                 xaxis_title=sim_feature, yaxis_title="AI Probability",
                 legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1)
             )
-            st.plotly_chart(fig_sens, use_container_width=True)
+            st.plotly_chart(fig_sens, width="stretch")
             
         except Exception as e:
             st.warning("Sensitivity simulation requires a model that supports probability mapping (`predict_proba`).")
@@ -285,7 +293,7 @@ with tab3:
     report_df.insert(1, "System_Recommendation", pred_advice)
     report_df.insert(2, "AI_Confidence_%", round(confidence, 2))
     
-    st.dataframe(report_df, use_container_width=True)
+    st.dataframe(report_df, width="stretch")
     
     csv = report_df.to_csv(index=False).encode('utf-8')
     st.download_button(
@@ -316,7 +324,7 @@ with tab4:
     with c2:
         st.write("") # Spacing
         st.write("")
-        fetch_button = st.button("Fetch Live Data & Forecast", type="primary", use_container_width=True)
+        fetch_button = st.button("Fetch Live Data & Forecast", type="primary", width="stretch")
 
     if fetch_button:
         with st.spinner(f"Connecting to satellite telemetry for {city_search}..."):
@@ -414,7 +422,7 @@ with tab4:
                             yaxis_range=[0, max_y]
                         )
                         fig_forecast.update_xaxes(showgrid=False)
-                        st.plotly_chart(fig_forecast, use_container_width=True)
+                        st.plotly_chart(fig_forecast, width="stretch")
 
                     with chart_col2:
                         # Live Pollutant Hazard Profile
@@ -445,7 +453,7 @@ with tab4:
                             paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)", font={'color': "white"},
                             xaxis_title="% of Safe Limit Consumed"
                         )
-                        st.plotly_chart(fig_hazard, use_container_width=True)
+                        st.plotly_chart(fig_hazard, width="stretch")
 
             except requests.exceptions.ConnectionError:
                 st.error("🔌 **Network Connection Error:** Python is being blocked from accessing the internet. Please check your Wi-Fi or disable active VPNs/Firewalls.")
@@ -502,7 +510,7 @@ with tab5:
                         gauge={'axis': {'range': [None, 150]}, 'bar': {'color': "#4facfe"}, 'threshold': {'line': {'color': "white", 'width': 2}, 'value': 15}}
                     ))
                     fig_gauges.update_layout(height=250, margin=dict(l=10, r=10, t=30, b=10), paper_bgcolor="rgba(0,0,0,0)", font={'color': "white"})
-                    st.plotly_chart(fig_gauges, use_container_width=True)
+                    st.plotly_chart(fig_gauges, width="stretch")
 
                 with top_c2:
                     st.markdown("#### Environmental Footprint (Radar)")
@@ -518,7 +526,7 @@ with tab5:
                         theta=categories, fill='toself', name=d2["City"], line_color="#4facfe"
                     ))
                     fig_radar.update_layout(height=250, margin=dict(l=30, r=30, t=30, b=10), paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)", font={'color': "white"}, polar=dict(radialaxis=dict(visible=False)))
-                    st.plotly_chart(fig_radar, use_container_width=True)
+                    st.plotly_chart(fig_radar, width="stretch")
 
                 st.divider()
 
@@ -542,7 +550,7 @@ with tab5:
                     fig_delta.update_traces(marker_color=delta_df['Color'])
                     fig_delta.add_vline(x=0, line_width=2, line_color="white")
                     fig_delta.update_layout(height=250, margin=dict(l=10, r=10, t=10, b=10), paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)", font={'color': "white"})
-                    st.plotly_chart(fig_delta, use_container_width=True)
+                    st.plotly_chart(fig_delta, width="stretch")
 
                 with bot_c2:
                     st.markdown("#### Toxic Gases Breakdown")
@@ -552,7 +560,7 @@ with tab5:
                     
                     fig_comp_gas = px.bar(melted_df, x="Gas", y="Level", color="City", barmode="group", color_discrete_sequence=["#EF553B", "#4facfe"])
                     fig_comp_gas.update_layout(height=250, margin=dict(l=10, r=10, t=10, b=10), paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)", font={'color': "white"}, legend=dict(yanchor="top", y=0.99, xanchor="right", x=0.99))
-                    st.plotly_chart(fig_comp_gas, use_container_width=True)
+                    st.plotly_chart(fig_comp_gas, width="stretch")
 
                 st.divider()
 
@@ -637,7 +645,7 @@ with tab6:
         # UI Polish: Move legend to the top so it doesn't crowd the chart
         fig1.update_layout(height=400, paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)", font={'color': "white"}, 
                            legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1))
-        st.plotly_chart(fig1, use_container_width=True)
+        st.plotly_chart(fig1, width="stretch")
 
         st.write("") # Spacer
 
@@ -660,7 +668,7 @@ with tab6:
                 go.Scatter(x=forecast_df[time_col], y=forecast_df[target_col], mode='lines', line=dict(color='#AB63FA', width=3), name='Predicted Trend')
             ])
             fig2.update_layout(height=300, margin=dict(t=10, b=10), paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)", font={'color': "white"}, showlegend=True, legend=dict(yanchor="top", y=0.99, xanchor="left", x=0.01))
-            st.plotly_chart(fig2, use_container_width=True)
+            st.plotly_chart(fig2, width="stretch")
 
         with c2:
             # 3. ANOMALY DETECTION CHART
@@ -674,7 +682,7 @@ with tab6:
             fig3 = px.scatter(hist_df, x=time_col, y=target_col, color='Anomaly', color_discrete_map={True: '#EF553B', False: '#00CC96'})
             fig3.add_trace(go.Scatter(x=hist_df[time_col], y=hist_df[target_col], mode='lines', line=dict(color='#00CC96', width=1), showlegend=False, hoverinfo='skip'))
             fig3.update_layout(height=300, margin=dict(t=10, b=10), paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)", font={'color': "white"}, showlegend=False)
-            st.plotly_chart(fig3, use_container_width=True)
+            st.plotly_chart(fig3, width="stretch")
 
         st.divider()
         
@@ -688,7 +696,7 @@ with tab6:
         
         fig4 = px.line(x=epochs, y=loss, markers=True, color_discrete_sequence=['#4facfe'])
         fig4.update_layout(height=250, margin=dict(t=10, b=10), paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)", font={'color': "white"}, xaxis_title="Training Epoch", yaxis_title="Mean Squared Error")
-        st.plotly_chart(fig4, use_container_width=True)
+        st.plotly_chart(fig4, width="stretch")
 
 
     # ==========================================
@@ -703,7 +711,7 @@ with tab6:
         with in_c2:
             st.write("")
             st.write("")
-            run_api_dl = st.button("Run LSTM Simulation", type="primary", use_container_width=True)
+            run_api_dl = st.button("Run LSTM Simulation", type="primary", width="stretch")
             
         # BUG FIX: This runs OUTSIDE the columns, taking up the full screen width!
         if run_api_dl:
@@ -744,7 +752,7 @@ with tab6:
                 custom_df = pd.read_csv(uploaded_file) if uploaded_file.name.endswith('.csv') else pd.read_excel(uploaded_file)
                 
                 with st.expander("👀 Preview Uploaded Data", expanded=False):
-                    st.dataframe(custom_df.head(10), use_container_width=True)
+                    st.dataframe(custom_df.head(10), width="stretch")
                 
                 col_names = custom_df.columns.tolist()
                 
